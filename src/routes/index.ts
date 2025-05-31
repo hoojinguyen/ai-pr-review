@@ -1,8 +1,8 @@
 import { Router } from 'express';
+import webHookRouter from './webHookRoute';
 
 const apiRouter = Router();
 
-// Register route modules
-// apiRouter.use('/users', userRouter);
+apiRouter.use('/webhook', webHookRouter);
 
 export { apiRouter };

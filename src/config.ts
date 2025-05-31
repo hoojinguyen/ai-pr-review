@@ -2,28 +2,28 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-interface ServerConfig {
+export interface ServerConfig {
   port: number;
   host: string;
 }
 
-interface GitHubConfig {
-  webhookSecret: string | undefined;
+export interface GitHubConfig {
   token: string | undefined;
   baseUrl: string;
-  appId: string | undefined;
-  privateKey: string | undefined;
-  installationId: string | undefined;
+  webhookSecret?: string | undefined;
+  appId?: string | undefined;
+  privateKey?: string | undefined;
+  installationId?: string | undefined;
 }
 
-interface AWSConfig {
+export interface AWSConfig {
   region: string;
   modelId: string;
   maxTokens: number;
   temperature: number;
 }
 
-interface LoggingConfig {
+export interface LoggingConfig {
   level: string;
   file: string | undefined;
 }
