@@ -1,0 +1,113 @@
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+interface ServerConfig {
+  port: number;
+  host: string;
+}
+
+interface GitHubConfig {
+  webhookSecret: string | undefined;
+  token: string | undefined;
+  baseUrl: string;
+  appId: string | undefined;
+  privateKey: string | undefined;
+  installationId: string | undefined;
+}
+
+interface AWSConfig {
+  region: string;
+  modelId: string;
+  maxTokens: number;
+  temperature: number;
+}
+
+interface LoggingConfig {
+  level: string;
+  file: string | undefined;
+}
+
+interface Config {
+  server: ServerConfig;
+  github: GitHubConfig;
+  aws: AWSConfig;
+  logging: LoggingConfig;
+}
+
+class ConfigManager {
+  private readonly config: Config;
+
+  constructor() {
+    this.config = {
+      server: {
+        port: Number(process.env.PORT) || 3000,
+        host: process.env.HOST || '0.0.0.0',
+      },
+      github: {
+        webhookSecret: process.env.GITHUB_WEBHOOK_SECRET,
+        token: process.env.GITHUB_TOKEN,
+        baseUrl: process.env.GITHUB_API_URL || 'https://api.github.com',
+        appId: process.env.GITHUB_APP_ID,
+        privateKey: process.env.GITHUB_PRIVATE_KEY,
+        installationId: process.env.GITHUB_INSTALLATION_ID,
+      },
+      aws: {
+        region: process.env.AWS_REGION || 'us-east-1',
+        modelId: process.env.AWS_BEDROCK_MODEL_ID || 'amazon.titan-text-premier-v1:0',
+        maxTokens: parseInt(process.env.AWS_BEDROCK_MAX_TOKENS || '1000', 10),
+        temperature: parseFloat(process.env.AWS_BEDROCK_TEMPERATURE || '0.3'),
+      },
+      logging: {
+        level: process.env.LOG_LEVEL || 'info',
+        file: process.env.LOG_FILE,
+      },
+    };
+  }
+
+
+  public getConfig(): Config {
+    return this.config;
+  }
+
+
+  public getGitHubConfig(): GitHubConfig {
+    return this.config.github;
+  }
+
+
+  public getAWSConfig(): AWSConfig {
+    return this.config.aws;
+  }
+
+
+  public getServerConfig(): ServerConfig {
+    return this.config.server;
+  }
+
+  public getLoggingConfig(): LoggingConfig {
+    return this.config.logging;
+  }
+
+
+  public validateConfig(): boolean {
+    // Check for required GitHub configuration
+    if (!this.config.github.webhookSecret) {
+      throw new Error('Missing required configuration: GITHUB_WEBHOOK_SECRET');
+    }
+
+    // Check for GitHub authentication (either token or app credentials)
+    if (!this.config.github.token && !(this.config.github.appId && this.config.github.privateKey)) {
+      throw new Error(
+        'Missing required GitHub authentication: Either GITHUB_TOKEN or GITHUB_APP_ID and GITHUB_PRIVATE_KEY must be provided',
+      );
+    }
+
+    // AWS credentials are expected to be provided via environment variables
+    // or instance profiles, so we don't validate them here
+
+    return true;
+  }
+}
+
+export default new ConfigManager();
