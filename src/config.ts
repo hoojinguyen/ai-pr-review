@@ -159,8 +159,30 @@ class ConfigManager {
       );
     }
 
-    // AWS credentials are expected to be provided via environment variables
-    // or instance profiles, so we don't validate them here
+    // Check that at least one AI provider is configured
+    const aiConfig = this.getAIConfig();
+    let hasValidProvider = false;
+
+    // Check Bedrock configuration
+    if (aiConfig.providers.bedrock && aiConfig.providers.bedrock.region) {
+      hasValidProvider = true;
+    }
+
+    // Check OpenAI configuration
+    if (aiConfig.providers.openai && aiConfig.providers.openai.apiKey) {
+      hasValidProvider = true;
+    }
+
+    // Check Anthropic configuration
+    if (aiConfig.providers.anthropic && aiConfig.providers.anthropic.apiKey) {
+      hasValidProvider = true;
+    }
+
+    if (!hasValidProvider) {
+      throw new Error(
+        'No valid AI provider configured. Please configure at least one of: Bedrock, OpenAI, or Anthropic',
+      );
+    }
 
     return true;
   }

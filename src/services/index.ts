@@ -1,3 +1,3 @@
-export * from './AwsService';
+export * from './AIService';
 export * from './GithubService';
 export * from './SecurityService';

@@ -1,6 +1,6 @@
 import config from '@/config';
 import logger from '@/logging';
-import { AwsService, GithubService, SecurityService } from '@/services';
+import { AIService, GithubService, SecurityService } from '@/services';
 import { Request, Response } from 'express';
 
 interface PullRequestData {
@@ -25,14 +25,14 @@ interface ReviewState {
 export class WebHookController {
   private prReviewState: Map<string, ReviewState>;
   private githubService: GithubService;
-  private awsService: AwsService;
+  private aiService: AIService;
   private securityService: SecurityService;
 
   constructor() {
     this.prReviewState = new Map();
 
     this.githubService = new GithubService();
-    this.awsService = new AwsService();
+    this.aiService = new AIService();
     this.securityService = new SecurityService();
   }
 
@@ -87,7 +87,7 @@ export class WebHookController {
         files,
       };
 
-      const review = await this.awsService.reviewPullRequest(prData);
+      const review = await this.aiService.reviewPullRequest(prData, owner, repo, prNumber);
       const comment = await this.githubService.createComment(owner, repo, prNumber, review);
 
       this.prReviewState.set(prKey, {
@@ -152,7 +152,7 @@ export class WebHookController {
         files,
       };
 
-      const review = await this.awsService.reviewPullRequest(prData);
+      const review = await this.aiService.reviewPullRequest(prData, owner, repo, prNumber);
       const reviewComment = await this.githubService.createComment(owner, repo, prNumber, review);
 
       logger.info('Successfully posted manual review comment', {

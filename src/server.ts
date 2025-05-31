@@ -18,6 +18,7 @@ class Server {
     this.port = Number(process.env.PORT) || 3000;
     this.apiPrefix = process.env.API_PREFIX || '/api';
     this.serverConfig = config.getServerConfig();
+
     this.initializeMiddlewares();
     this.initializeRoutes();
     this.initializeErrorHandling();
@@ -54,6 +55,8 @@ class Server {
 
   public start(): void {
     this.server = this.app.listen(this.port, () => {
+      config.validateConfig();
+
       logger.info(`Server running at http://${this.serverConfig.host}:${this.serverConfig.port}`);
     });
     this.setupGracefulShutdown();
